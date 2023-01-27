@@ -2,10 +2,10 @@ import type {ButtonHTMLAttributes, FC, PropsWithChildren} from "react";
 import type {VariantProps} from "class-variance-authority";
 import {cva} from "class-variance-authority";
 
-const button = cva(['cursor-pointer','outline-none', 'uppercase', 'font-medium', 'text-white', 'py-2', 'px-4', 'transition-all', 'rounded-lg', 'hover:shadow-lg', 'focus:shadow-lg', 'shadow-purple-900'], {
+const button = cva(['cursor-pointer','outline-none', 'uppercase', 'font-medium', 'py-2', 'px-4', 'transition-all', 'rounded-lg', 'hover:shadow-lg', 'focus:shadow-lg', 'shadow-purple-900'], {
 	variants: {
 		variant: {
-			primary: ['from-indigo-400', 'to-violet-600', 'bg-gradient-to-r',],
+			primary: ['from-indigo-400', 'to-violet-600', 'bg-gradient-to-r', 'text-white',],
 			secondary: ['bg-slate-200', 'text-violet-900'],
 		},
 		disabled: {

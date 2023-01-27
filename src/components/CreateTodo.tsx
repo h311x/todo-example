@@ -1,10 +1,8 @@
 import type {FC} from 'react'
-import Field from "./ui/Field";
-import Textarea from "./ui/Textarea";
 import Dialog from "./ui/Dialog";
-import {useState} from "react";
+import {useReducer} from "react";
 import {api} from "../utils/api";
-import Button from "./ui/Button";
+import type {Todo} from ".prisma/client";
 
 type Props = {
 	isOpen: boolean
@@ -12,19 +10,20 @@ type Props = {
 }
 
 const CreateTodo: FC<Props> = ({isOpen, setIsOpen}) => {
-	const [title, setTitle] = useState('')
-	const [description, setDescription] = useState('')
+	const [formState, dispatch] = useReducer((state: Omit<Todo, 'id'>, action: Partial<Omit<Todo, 'id'>>) => {
+		return {...state, ...action}
+	}, {
+		title: '',
+		description: ''
+	})
 	const createTodo = api.todo.createTodo.useMutation()
 	const utils = api.useContext()
 
-	const onSave = (cb: () => void) => {
-		createTodo.mutate({title, description}, {
+	const onSave = async () => {
+		await createTodo.mutateAsync(formState, {
 			onSuccess: () => {
 				utils.todo.getTodoList.invalidate().catch(e => console.error(e))
 			},
-			onSettled: () => {
-				cb()
-			}
 		})
 	}
 
@@ -33,32 +32,10 @@ const CreateTodo: FC<Props> = ({isOpen, setIsOpen}) => {
 			isOpen={isOpen}
 			setIsOpen={setIsOpen}
 			title={'Create Todo'}
-			onClose={() => {
-				setTitle('')
-				setDescription('')
-			}}>
-			{
-				({close}) => (
-					<div className={'flex flex-col gap-2'}>
-						<form onSubmit={(e) => {
-							e.preventDefault()
-							onSave(close)
-						}}>
-							<div className='flex flex-col gap-4'>
-								<Field value={title} onChange={(e) => setTitle(e.target.value)} placeholder='Add todo title'/>
-								<Textarea value={description} onChange={(e) => setDescription(e.target.value)}
-													placeholder='Add todo description'/>
-							</div>
-
-							<div className="flex gap-4 mt-4">
-								<Button disabled={!title || !description}>Save</Button>
-								<Button type={'button'} variant={'secondary'} onClick={() => close()}>Cancel</Button>
-							</div>
-						</form>
-					</div>
-				)
-			}
-		</Dialog>
+			formState={formState}
+			setFormState={dispatch}
+			onSave={onSave}
+		/>
 	)
 }
 

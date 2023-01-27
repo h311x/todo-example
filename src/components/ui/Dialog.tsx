@@ -9,9 +9,10 @@ type Props = {
 	children: (params: {close: (() => void)}) => ReactNode
 }
 
-const Dialog: FC<Props> = ({children, title, setIsOpen, isOpen}) => {
+const Dialog: FC<Props> = ({children, title, setIsOpen, isOpen, onClose}) => {
 	const handleOnClose = () => {
 		setIsOpen(false)
+		onClose()
 	}
 
 	return (

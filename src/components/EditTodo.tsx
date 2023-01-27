@@ -5,20 +5,21 @@ import Dialog from "./ui/Dialog";
 import {useState} from "react";
 import {api} from "../utils/api";
 import Button from "./ui/Button";
+import type {Todo} from ".prisma/client";
 
 type Props = {
-	isOpen: boolean
-	setIsOpen: (arg: boolean) => void
+	setIsOpen: () => void,
+	todo: Todo
 }
 
-const CreateTodo: FC<Props> = ({isOpen, setIsOpen}) => {
-	const [title, setTitle] = useState('')
-	const [description, setDescription] = useState('')
-	const createTodo = api.todo.createTodo.useMutation()
+const EditTodo: FC<Props> = ({setIsOpen, todo}) => {
+	const [title, setTitle] = useState(todo?.title)
+	const [description, setDescription] = useState(todo?.description)
+	const editTodo = api.todo.editTodo.useMutation()
 	const utils = api.useContext()
 
 	const onSave = (cb: () => void) => {
-		createTodo.mutate({title, description}, {
+		editTodo.mutate({id: todo.id, title, description}, {
 			onSuccess: () => {
 				utils.todo.getTodoList.invalidate().catch(e => console.error(e))
 			},
@@ -27,12 +28,11 @@ const CreateTodo: FC<Props> = ({isOpen, setIsOpen}) => {
 			}
 		})
 	}
-
 	return (
 		<Dialog
-			isOpen={isOpen}
+			isOpen={true}
 			setIsOpen={setIsOpen}
-			title={'Create Todo'}
+			title={'Edit Todo'}
 			onClose={() => {
 				setTitle('')
 				setDescription('')
@@ -62,4 +62,4 @@ const CreateTodo: FC<Props> = ({isOpen, setIsOpen}) => {
 	)
 }
 
-export default CreateTodo
+export default EditTodo
